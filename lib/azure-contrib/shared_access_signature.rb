@@ -21,7 +21,7 @@ module Azure
 
         attr_accessor :uri, :options
 
-        def initialize(uri, options = {}, account =  ENV['AZURE_STORAGE_ACCOUNT'])
+        def initialize(uri, options = {}, account = Azure.config.storage_account_name)
           # This is the uri that we are signing
           @uri = Addressable::URI.parse(uri)
 
@@ -32,7 +32,7 @@ module Azure
         end
 
         # Create a "canonicalized resource" from the full uri to be signed
-        def canonicalized_resource(uri, account = ENV['AZURE_STORAGE_ACCOUNT'], is_blob = false)
+        def canonicalized_resource(uri, account = Azure.config.storage_account_name, is_blob = false)
           path = URI.unescape(uri.path) # Addressable::URI
           # There is only really one level deep for containers, the remainder is the BLOB key (that looks like a path)
           path_array = path.split('/').reject {|p| p == ''}
@@ -70,10 +70,8 @@ module Azure
           string_to_sign << options[:canonicalized_resource]
           string_to_sign << options[:identifier]
 
-          Azure::Core::Auth::Signer.new(ENV['AZURE_STORAGE_ACCESS_KEY']).sign(string_to_sign.join("\n").force_encoding("UTF-8"))
+          Azure::Core::Auth::Signer.new(Azure.config.storage_access_key).sign(string_to_sign.join("\n").force_encoding("UTF-8"))
         end
-
-
 
         def sign
           @uri.query_values = (@uri.query_values || {}).merge(create_query_values(@options))
