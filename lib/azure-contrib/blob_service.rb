@@ -2,7 +2,7 @@
 
 # Make sure the original is included
 require 'azure/blob/blob_service'
-require 'celluloid'
+require 'celluloid/current'
 require 'timeout'
 
 class ::File
